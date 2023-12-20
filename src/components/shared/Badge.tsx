@@ -4,7 +4,10 @@ type BadgeProps = {
 
 const Badge = ({ title }: BadgeProps) => {
   return (
-    <span className="h-6 px-3 py-1 bg-gray-2 text-xs-plus text-black rounded-xl">
+    <span
+      className="inline-block h-6 px-3 bg-gray-1.5 text-xs-plus text-black
+       leading-6 rounded-xl"
+    >
       {title}
     </span>
   );

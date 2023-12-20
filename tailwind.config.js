@@ -6,6 +6,7 @@ export default {
       colors: {
         gray: {
           1: "#EFEFEF",
+          1.5: "#e2e2e2",
           2: "#C8C8C8",
           3: "#8E8E8E",
           4: "#707070",
