@@ -164,7 +164,7 @@ const OrderTable = () => {
       </div>
 
       <div className="h-[530px] mb-8">
-        <table className="w-full ">
+        <table className="w-full">
           <thead>
             <tr className="text-xs h-12">
               {Object.entries(tableHeaderTitles).map(([key, title]) => (
