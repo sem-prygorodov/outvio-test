@@ -1,18 +1,14 @@
 import SearchIcon from "../../assets/icons/SearchIcon";
 
-type TextInputProps = {
+type InputProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
   withSearchIcon?: boolean;
+  type?: "text" | "search" | "number" | "datetime-local";
 };
 
-const TextInput = ({
-  value,
-  onChange,
-  placeholder,
-  withSearchIcon,
-}: TextInputProps) => {
+const Input = ({ value, onChange, placeholder, withSearchIcon, type }: InputProps) => {
   return (
     <div className="flex w-64">
       {withSearchIcon && (
@@ -22,6 +18,7 @@ const TextInput = ({
       )}
 
       <input
+        type={type}
         className="w-full h-10 px-3.5 bg-gray-1 text-xs-plus
                  placeholder:text-gray-3 outline-none"
         onChange={(e) => onChange(e.target.value)}
@@ -32,4 +29,4 @@ const TextInput = ({
   );
 };
 
-export default TextInput;
+export default Input;
