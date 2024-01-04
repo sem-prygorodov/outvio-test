@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import orderSlice from "./order-slice";
+import orderFormSlice from "./order-form-slice";
 
 const store = configureStore({
-  reducer: orderSlice,
+  reducer: { orderTable: orderSlice, order: orderFormSlice },
 });
 
 export { store };
