@@ -29,8 +29,11 @@ const OrderForm = ({ onConfirm }: OrderFormProps) => {
 
   return (
     <div className="flex flex-col gap-4">
-      {formItems.map(({ title, element }) => (
-        <div className="flex justify-between items-center">
+      {formItems.map(({ title, element }, index) => (
+        <div
+          key={`order-form-item-${title}-${index}`}
+          className="flex justify-between items-center"
+        >
           <div className="w-1/3 text-xs-plus px-4">{title}</div>
           {element}
         </div>
@@ -112,14 +115,20 @@ const OrderStatus = () => {
 const AddNewOrderButton = ({ onConfirm }: { onConfirm: () => void }) => {
   const orderData = useSelector((state: RootState) => state.order.form);
 
+  const allOrders = useSelector((state: RootState) => state.orderTable.orders);
+
   const dispatch = useDispatch();
 
   const isValid =
     orderData.id && orderData.total && orderData.quantity && orderData.status && orderData.date;
 
   const confirmHandle = () => {
-    dispatch(addNewOrder(orderData));
-    onConfirm();
+    if (allOrders.some((x) => x.id === orderData.id)) {
+      alert("You can't add an order with existing id");
+    } else {
+      dispatch(addNewOrder(orderData));
+      onConfirm();
+    }
   };
   return (
     <div className="mt-2 flex justify-end">

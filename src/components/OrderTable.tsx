@@ -46,7 +46,7 @@ const OrderTable = () => {
     state: SortingStates;
   }>({ sortBy: "id", state: "desc" });
 
-  const orders = useSelector((state: RootState) => state.orders);
+  const orders = useSelector((state: RootState) => state.orderTable.orders);
 
   const dispatch = useDispatch();
 
@@ -55,6 +55,10 @@ const OrderTable = () => {
       dispatch(loadOrders(await getOrders()));
     })();
   }, []);
+
+  useEffect(() => {
+    setPage(0);
+  }, [search]);
 
   const ChevronButton = ({ sortBy }: { sortBy: SortableTableProps }) => {
     const handleSortingState = () => {
@@ -164,54 +168,62 @@ const OrderTable = () => {
       </div>
 
       <div className="h-[530px] mb-8">
-        <table className="w-full">
-          <thead>
-            <tr className="text-xs h-12">
-              {Object.entries(tableHeaderTitles).map(([key, title]) => (
-                <th key={title} className="pb-4 w-1/5">
-                  <div className="flex items-center justify-center gap-x-2 select-none font-semibold">
-                    {title} <ChevronButton sortBy={key as SortableTableProps} />
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {pagedOrders.map(({ id, date, total, quantity, status, currency }, index) => (
-              <tr
-                key={`${id}-${index}`}
-                className="h-12 border-b border-gray-2 last:border-none 
-                         text-xs-plus text-center"
-              >
-                <td>{id}</td>
-                <td>{formatDate(date)}</td>
-                <td>{formatCurrency(total, currency)}</td>
-                <td>{quantity}</td>
-                <td>
-                  <Badge title={status} />
-                </td>
+        {!!pagedOrders.length && (
+          <table className="w-full">
+            <thead>
+              <tr className="text-xs h-12">
+                {Object.entries(tableHeaderTitles).map(([key, title]) => (
+                  <th key={title} className="pb-4 w-1/5">
+                    <div className="flex items-center justify-center gap-x-2 select-none font-semibold">
+                      {title} <ChevronButton sortBy={key as SortableTableProps} />
+                    </div>
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {pagedOrders.map(({ id, date, total, quantity, status, currency }, index) => (
+                <tr
+                  key={`${id}-${index}`}
+                  className="h-12 border-b border-gray-2 last:border-none 
+                         text-xs-plus text-center"
+                >
+                  <td>{id}</td>
+                  <td>{formatDate(date)}</td>
+                  <td>{formatCurrency(total, currency)}</td>
+                  <td>{quantity}</td>
+                  <td>
+                    <Badge title={status} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {!pagedOrders.length && (
+          <div className="flex items-center justify-center text-xs-plus">No orders found</div>
+        )}
       </div>
 
       {/* This can be extracted to a separate component for clarity */}
-      <div className="w-full flex items-center justify-center gap-x-2">
-        {pages.map((x) => (
-          <button
-            key={`page-${x}`}
-            className={`rounded-full px-4 py-2 ${
-              x === page ? "text-black bg-gray-1 ring-2 ring-gray-1.5 font-bold" : "text-gray-4"
-            }`}
-            onClick={() => {
-              setPage(x);
-            }}
-          >
-            {x + 1}
-          </button>
-        ))}
-      </div>
+      {!!pagedOrders.length && (
+        <div className="w-full flex items-center justify-center gap-x-2">
+          {pages.map((x) => (
+            <button
+              key={`page-${x}`}
+              className={`rounded-full px-4 py-2 ${
+                x === page ? "text-black bg-gray-1 ring-2 ring-gray-1.5 font-bold" : "text-gray-4"
+              }`}
+              onClick={() => {
+                setPage(x);
+              }}
+            >
+              {x + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </>
   );
 };

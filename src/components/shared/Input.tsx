@@ -9,6 +9,24 @@ type InputProps = {
 };
 
 const Input = ({ value, onChange, placeholder, withSearchIcon, type }: InputProps) => {
+  const keyDownHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (type === "number") {
+      ["e", "E", "+", "-", ",", "."].includes(e.key) && e.preventDefault();
+    }
+  };
+
+  const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (type === "number") {
+      if (Number(e.target.value)) {
+        onChange(e.target.value);
+      } else {
+        onChange("");
+      }
+    } else {
+      onChange(e.target.value);
+    }
+  };
+
   return (
     <div className="flex w-64">
       {withSearchIcon && (
@@ -19,9 +37,10 @@ const Input = ({ value, onChange, placeholder, withSearchIcon, type }: InputProp
 
       <input
         type={type}
+        onKeyDown={keyDownHandler}
         className="w-full h-10 px-3.5 bg-gray-1 text-xs-plus
                  placeholder:text-gray-3 outline-none"
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChangeHandler}
         placeholder={placeholder}
         value={value}
       />
