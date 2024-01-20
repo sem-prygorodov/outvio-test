@@ -17,11 +17,7 @@ const Input = ({ value, onChange, placeholder, withSearchIcon, type }: InputProp
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (type === "number") {
-      if (Number(e.target.value)) {
-        onChange(e.target.value);
-      } else {
-        onChange("");
-      }
+      onChange(Number(e.target.value) ? e.target.value : "");
     } else {
       onChange(e.target.value);
     }
