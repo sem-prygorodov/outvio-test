@@ -8,11 +8,12 @@ import { loadOrders } from "../state/order-slice";
 import { OrderData, getOrders } from "../data/client";
 import Badge from "./shared/Badge";
 import { formatCurrency } from "../utils/currency";
-import OrderForm from "./OrderForm";
+import OrderForm from "./order-form/OrderForm";
 import ChevronIcon from "../assets/icons/ChevronIcon";
 import ChevronSelectorIcon from "../assets/icons/ChevronSelectorIcon";
+import { Pagination } from "./shared/Pagination";
 
-const ITEMS_PER_PAGE = 10;
+export const ITEMS_PER_PAGE = 10;
 
 type SortingStates = "desc" | "asc";
 
@@ -56,26 +57,12 @@ const OrderTable = () => {
     })();
   }, []);
 
-  useEffect(() => {
-    setPage(0);
-  }, [search]);
-
   const ChevronButton = ({ sortBy }: { sortBy: SortableTableProps }) => {
     const handleSortingState = () => {
-      switch (selectedSortingState.state) {
-        case "desc":
-          setSelectedSortingState({
-            sortBy: sortBy,
-            state: "asc",
-          });
-          break;
-        case "asc":
-          setSelectedSortingState({
-            sortBy: sortBy,
-            state: "desc",
-          });
-          break;
-      }
+      setSelectedSortingState({
+        sortBy,
+        state: selectedSortingState.state === "desc" ? "asc" : "desc",
+      });
     };
 
     if (selectedSortingState.sortBy === sortBy) {
@@ -114,7 +101,7 @@ const OrderTable = () => {
   };
 
   const filteredOrders = orders.filter((x) => {
-    const searchLowerCased = search.toLowerCase();
+    const searchLowerCased = search.toLowerCase().trim();
 
     return (
       x.id.toString().toLowerCase().includes(searchLowerCased) ||
@@ -131,6 +118,7 @@ const OrderTable = () => {
     if (sortableA < sortableB) {
       return selectedSortingState.state === "asc" ? -1 : 1;
     }
+
     if (sortableA > sortableB) {
       return selectedSortingState.state === "asc" ? 1 : -1;
     }
@@ -140,18 +128,20 @@ const OrderTable = () => {
 
   const pagedOrders = sortedOrders.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
-  // Lib like ramda could be used here
-  const pages = [...Array(Math.ceil(filteredOrders.length / ITEMS_PER_PAGE)).keys()];
+  const searchHandler = (value: string): void => {
+    setSearch(value);
+    setPage(0);
+  };
 
   return (
     <>
       <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-2">
         <span className="text-2xl font-bold">All orders</span>
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center space-x-2">
           <Input
             type="search"
             value={search}
-            onChange={setSearch}
+            onChange={searchHandler}
             withSearchIcon
             placeholder="Search"
           />
@@ -174,8 +164,9 @@ const OrderTable = () => {
               <tr className="text-xs h-12">
                 {Object.entries(tableHeaderTitles).map(([key, title]) => (
                   <th key={title} className="pb-4 w-1/5">
-                    <div className="flex items-center justify-center gap-x-2 select-none font-semibold">
-                      {title} <ChevronButton sortBy={key as SortableTableProps} />
+                    <div className="flex items-center justify-center space-x-2 select-none font-semibold">
+                      <span>{title}</span>
+                      <ChevronButton sortBy={key as SortableTableProps} />
                     </div>
                   </th>
                 ))}
@@ -206,24 +197,7 @@ const OrderTable = () => {
         )}
       </div>
 
-      {/* This can be extracted to a separate component for clarity */}
-      {!!pagedOrders.length && (
-        <div className="w-full flex items-center justify-center gap-x-2">
-          {pages.map((x) => (
-            <button
-              key={`page-${x}`}
-              className={`rounded-full px-4 py-2 ${
-                x === page ? "text-black bg-gray-1 ring-2 ring-gray-1.5 font-bold" : "text-gray-4"
-              }`}
-              onClick={() => {
-                setPage(x);
-              }}
-            >
-              {x + 1}
-            </button>
-          ))}
-        </div>
-      )}
+      <Pagination onChange={setPage} selectedPage={page} totalItems={filteredOrders.length} />
     </>
   );
 };
