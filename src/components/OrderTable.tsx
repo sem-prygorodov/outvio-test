@@ -15,12 +15,12 @@ import { Pagination } from "./shared/Pagination";
 
 export const ITEMS_PER_PAGE = 10;
 
-type SortingStates = "desc" | "asc";
+type OrderingState = "desc" | "asc";
 
-type SortableTableProps = keyof Omit<OrderData, "currency">;
+type SortableTableKey = keyof Omit<OrderData, "currency">;
 
 const tableHeaderTitles: {
-  [key in SortableTableProps]: string;
+  [key in SortableTableKey]: string;
 } = {
   id: "Order ID",
   date: "Order date",
@@ -30,7 +30,7 @@ const tableHeaderTitles: {
 };
 
 const tableSortHelper: {
-  [key in SortableTableProps]: (value: string) => number | string;
+  [key in SortableTableKey]: (value: string) => number | string;
 } = {
   id: (value) => parseInt(value),
   date: (value) => +new Date(value),
@@ -42,10 +42,10 @@ const tableSortHelper: {
 const OrderTable = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
-  const [selectedSortingState, setSelectedSortingState] = useState<{
-    sortBy: SortableTableProps;
-    state: SortingStates;
-  }>({ sortBy: "id", state: "desc" });
+  const [sorting, setSorting] = useState<{
+    sortBy: SortableTableKey;
+    orderBy: OrderingState;
+  }>({ sortBy: "id", orderBy: "desc" });
 
   const orders = useSelector((state: RootState) => state.orderTable.orders);
 
@@ -57,19 +57,19 @@ const OrderTable = () => {
     })();
   }, []);
 
-  const ChevronButton = ({ sortBy }: { sortBy: SortableTableProps }) => {
+  const ChevronButton = ({ sortBy }: { sortBy: SortableTableKey }) => {
     const handleSortingState = () => {
-      setSelectedSortingState({
+      setSorting({
         sortBy,
-        state: selectedSortingState.state === "desc" ? "asc" : "desc",
+        orderBy: sorting.orderBy === "desc" ? "asc" : "desc",
       });
     };
 
-    if (selectedSortingState.sortBy === sortBy) {
+    if (sorting.sortBy === sortBy) {
       return (
         <div
           onClick={handleSortingState}
-          className={`${selectedSortingState.state === "desc" ? "rotate-180" : ""} cursor-pointer`}
+          className={`${sorting.orderBy === "desc" ? "rotate-180" : ""} cursor-pointer`}
         >
           <ChevronIcon />
         </div>
@@ -110,17 +110,17 @@ const OrderTable = () => {
   });
 
   const sortedOrders = filteredOrders.sort((a, b) => {
-    const applicableSortingFunction = tableSortHelper[selectedSortingState.sortBy];
+    const applicableSortingFunction = tableSortHelper[sorting.sortBy];
 
-    const sortableA = applicableSortingFunction(a[selectedSortingState.sortBy]);
-    const sortableB = applicableSortingFunction(b[selectedSortingState.sortBy]);
+    const sortableA = applicableSortingFunction(a[sorting.sortBy]);
+    const sortableB = applicableSortingFunction(b[sorting.sortBy]);
 
     if (sortableA < sortableB) {
-      return selectedSortingState.state === "asc" ? -1 : 1;
+      return sorting.orderBy === "asc" ? -1 : 1;
     }
 
     if (sortableA > sortableB) {
-      return selectedSortingState.state === "asc" ? 1 : -1;
+      return sorting.orderBy === "asc" ? 1 : -1;
     }
 
     return 0;
@@ -166,7 +166,7 @@ const OrderTable = () => {
                   <th key={title} className="pb-4 w-1/5">
                     <div className="flex items-center justify-center space-x-2 select-none font-semibold">
                       <span>{title}</span>
-                      <ChevronButton sortBy={key as SortableTableProps} />
+                      <ChevronButton sortBy={key as SortableTableKey} />
                     </div>
                   </th>
                 ))}
