@@ -65,7 +65,9 @@ const OrderTable = () => {
       });
     };
 
-    if (sorting.sortBy === sortBy) {
+    const isSortingColumnSelected = sorting.sortBy === sortBy;
+
+    if (isSortingColumnSelected) {
       return (
         <div
           onClick={handleSortingState}
